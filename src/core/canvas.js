@@ -119,6 +119,18 @@ function getPixelArray() {
     return array;
 }
 
+function copyCanvas() {
+    var w = this.width;
+    var h = this.height;
+    var c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    var ctx = c.getContext('2d');
+    this.update();
+    ctx.drawImage( this, 0, 0, w, h );
+    return c;
+}
+
 function wrap(func) {
     return function() {
         // Make sure that we're using the correct global WebGL context
@@ -129,10 +141,10 @@ function wrap(func) {
     };
 }
 
-exports.canvas = function() {
-    var canvas = document.createElement('canvas');
+exports.canvas = function(canvas) {
+    canvas = canvas instanceof window.HTMLCanvasElement ? canvas : document.createElement('canvas');
     try {
-        gl = canvas.getContext('experimental-webgl', { premultipliedAlpha: false });
+        gl = canvas.getContext('webgl2', { premultipliedAlpha: false });
     } catch (e) {
         gl = null;
     }
@@ -178,6 +190,8 @@ exports.canvas = function() {
     canvas.vignette = wrap(vignette);
     canvas.vibrance = wrap(vibrance);
     canvas.sepia = wrap(sepia);
+
+    canvas.copyCanvas = wrap(copyCanvas);
 
     return canvas;
 };
